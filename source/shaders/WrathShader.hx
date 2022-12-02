@@ -176,6 +176,7 @@ vec4 flixel_texture2DShaded(sampler2D bitmap, vec2 uv) {
 }
 
 void main() {
+  #pragma body
 	vec2 uv = openfl_TextureCoordv.xy;
 	vec2 fragCoord = uv * openfl_TextureSize.xy;
 
@@ -189,22 +190,12 @@ void main() {
 		var aOpt = angleOpt;
 		if(ClientPrefs.wrathAngleOpt > aOpt) aOpt = ClientPrefs.wrathAngleOpt;
 
-		/*var src = #if sys
-		File.getContent(Paths.txt("wrath"));
-		#else
-		Assets.getText(Paths.txt("wrath"));
-		#end
-
-		glFragmentSource = glFragmentSource.replace("AAAAAAA", src);*/
 		glFragmentSource = glFragmentSource.replace("ANGLE_OPT", Std.string(aOpt));
 		glFragmentSource = glFragmentSource.replace("WRATH_EXPERIMENTAL_DEFINE", ClientPrefs.wrathExperimental ? "#define EXPERIMENTAL" : "");
-		//trace(glFragmentSource);
 		super();
 
 		this.preset = preset;
 		this.applyRect.value = [0,0,1,1];
-
-		//resetParams();
 	}
 
 	public var trackedSprite:FlxSprite;
