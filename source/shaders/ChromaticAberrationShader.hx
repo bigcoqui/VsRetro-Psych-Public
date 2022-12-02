@@ -18,6 +18,7 @@ vec4 offsetColor(vec2 offset)
 
 void main()
 {
+  #pragma body
 	vec4 base = texture2D(bitmap, openfl_TextureCoordv);
 	base.r = offsetColor(rOffset).r;
 	base.g = offsetColor(gOffset).g;
