@@ -1261,6 +1261,13 @@ class PlayState extends MusicBeatState
 		botplayTxt.visible = cpuControlled;
 		botplayTxt.active = false;
 		add(botplayTxt);
+
+		var portTxt = new FlxText(0, 5, 1270);
+    portTxt.text = "PORTED BY THEORDA";
+    portTxt.setFormat(Paths.font("vcr.ttf"), 20, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE,FlxColor.BLACK);
+    portTxt.scrollFactor.set();
+    add(portTxt);
+
 		if(ClientPrefs.downScroll) {
 			botplayTxt.y = timeBarBG.y - 78;
 		}
@@ -1274,12 +1281,18 @@ class PlayState extends MusicBeatState
 		iconP2.cameras = [camHUD];
 		scoreTxt.cameras = [camHUD];
 		botplayTxt.cameras = [camHUD];
+		portTxt.cameras = [camHUD];
 		timeBar.cameras = [camHUD];
 		timeBarBG.cameras = [camHUD];
 		timeTxt.cameras = [camHUD];
 		//if(!doof.noDialogue) doof.cameras = [camHUD];
 
 		startingSong = true;
+
+		#if android
+		addAndroidControls();
+		androidControls.visible = true;
+		#end
 
 		// SONG SPECIFIC SCRIPTS
 		#if LUA_ALLOWED
@@ -2886,7 +2899,7 @@ for(note in groupedNotes) {
 			botplayTxt.alpha = 1 - Math.sin((Math.PI * botplaySine) / 180);
 		}
 
-		if (startedCountdown && canPause && controls.PAUSE)
+		if (startedCountdown && canPause && controls.PAUSE || FlxG.android.justReleased.BACK)
 		{
 			var ret:Dynamic = callOnLuas('onPause', []);
 			if(ret != FunkinLua.Function_Stop) {
