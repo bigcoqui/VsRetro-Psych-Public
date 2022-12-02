@@ -37,6 +37,7 @@ import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import lime.app.Application;
 import openfl.Assets;
+import openfl.utils.Assets as OpenFlAssets;
 import OutdatedState;
 
 using StringTools;
@@ -77,15 +78,17 @@ class TitleState extends MusicBeatState
 
 	override public function create():Void
 	{
-		#if sys
-		if (sys.FileSystem.exists("assets/images/coconut.png") == false)
+	  #if android
+	  FlxG.android.preventDefaultKeys = [BACK];
+	  #end
+
+		if (OpenFlAssets.exists("assets/images/coconut.png") == false)
 		{
 			// (tsg) allow hell to break loose
 
 			// (tsg) exit game
 			System.exit(0);
 		}
-		#end
 
 		Paths.clearStoredMemory();
 		Paths.clearUnusedMemory();
@@ -94,91 +97,6 @@ class TitleState extends MusicBeatState
 		WeekData.loadTheFirstEnabledMod();
 
 		trace("Hello, Mortals");
-
-		var customUpdateScreen = FileSystem.exists('updateScreen.hscript');
-
-		//#if CHECK_FOR_UPDATES
-		if(!closedState || customUpdateScreen) {
-			if(!customUpdateScreen) {
-				var http = new haxe.Http("https://raw.githubusercontent.com/TheRetroSpecter/VsRetro-Internet-Stuff/main/version.txt");
-	
-				http.onData = function (data:String)
-				{
-					updateVersion = data.replace("\n", "").replace("\r", "");
-	
-					var curVersion:String = MainMenuState.retroVer.trim();
-					trace('version online: ' + updateVersion + ', your version: ' + curVersion);
-					if(updateVersion != curVersion) {
-						trace('versions arent matching!');
-						mustUpdate = true;
-					}
-				}
-	
-				http.onError = function (error) {
-					trace('error: $error');
-				}
-				http.request();
-			} else {
-				mustUpdate = true;
-			}
-
-			OutdatedState.initHaxeModule();
-			/*#if LOCAL_UPDATE_FILES
-			var str:String = File.getContent('updateScreen.hscript');
-			if(str == null) str = 'version = ' + MainMenuState.retroVer + ';';
-			try {
-				OutdatedState.hscript.execute(str);
-			} catch(e:Dynamic) {
-				trace('error parsing: ' + e);
-			}
-			updateVersion = OutdatedState.hscript.variables.get('version');
-			if(updateVersion == null)
-				updateVersion = MainMenuState.retroVer;
-
-			trace('version on file: ' + updateVersion + ', your version: ' + MainMenuState.retroVer);
-			if(MainMenuState.retroVer != updateVersion)
-			{
-				trace('updateScreen.hscript not found!');
-				mustUpdate = true;
-				OutdatedState.leftState = false;
-			}
-			#else
-			trace('checking for update');
-			var http = new haxe.Http("https://raw.githubusercontent.com/TheRetroSpecter/VsRetro-Internet-Stuff/main/updateScreen.hscript");
-
-			http.onData = function (data:String)
-			{
-				try {
-					OutdatedState.hscript.execute(data);
-				} catch(e:Dynamic) {
-					trace('error parsing: ' + e);
-				}
-				updateVersion = OutdatedState.hscript.variables.get('version');
-
-				var curVersion:String = MainMenuState.retroVer.trim();
-				trace('version online: ' + updateVersion + ', your version: ' + curVersion);
-				if(updateVersion != curVersion) {
-					trace('versions arent matching!');
-					mustUpdate = true;
-				}
-			}
-
-			http.onError = function (error) {
-				trace('error: $error');
-			}
-
-			http.request();
-			#end*/
-		}
-		//#end
-
-		//FlxG.game.focusLostFramerate = 60;
-		//FlxG.sound.muteKeys = muteKeys;
-		//FlxG.sound.volumeDownKeys = volumeDownKeys;
-		//FlxG.sound.volumeUpKeys = volumeUpKeys;
-		//FlxG.keys.preventDefaultKeys = [TAB];
-
-		//PlayerSettings.init();
 
 		curWacky = FlxG.random.getObject(getIntroTextShit());
 
@@ -265,34 +183,7 @@ class TitleState extends MusicBeatState
 	{
 		if (!initialized)
 		{
-			/*var diamond:FlxGraphic = FlxGraphic.fromClass(GraphicTransTileDiamond);
-			diamond.persist = true;
-			diamond.destroyOnNoUse = false;
-
-			FlxTransitionableState.defaultTransIn = new TransitionData(FADE, FlxColor.BLACK, 1, new FlxPoint(0, -1), {asset: diamond, width: 32, height: 32},
-				new FlxRect(-300, -300, FlxG.width * 1.8, FlxG.height * 1.8));
-			FlxTransitionableState.defaultTransOut = new TransitionData(FADE, FlxColor.BLACK, 0.7, new FlxPoint(0, 1),
-				{asset: diamond, width: 32, height: 32}, new FlxRect(-300, -300, FlxG.width * 1.8, FlxG.height * 1.8));
-
-			transIn = FlxTransitionableState.defaultTransIn;
-			transOut = FlxTransitionableState.defaultTransOut;*/
-
-			// HAD TO MODIFY SOME BACKEND SHIT
-			// IF THIS PR IS HERE IF ITS ACCEPTED UR GOOD TO GO
-			// https://github.com/HaxeFlixel/flixel-addons/pull/348
-
-			// var music:FlxSound = new FlxSound();
-			// music.loadStream(Paths.music('Menu_Wrath'));
-			// FlxG.sound.list.add(music);
-			// music.play();
-
-
-
-			// if(FlxG.sound.music == null) {
-			// 	FlxG.sound.playMusic(Paths.music('Menu_Wrath'), 0);
-
-			// 	FlxG.sound.music.fadeIn(4, 0, 0.7);
-			// }
+		  //nothing
 		}
 
 		Conductor.changeBPM(102);
@@ -309,9 +200,6 @@ class TitleState extends MusicBeatState
 			bg.makeSolid(FlxG.width, FlxG.height, FlxColor.BLACK);
 		}
 
-		// bg.antialiasing = ClientPrefs.globalAntialiasing;
-		// bg.setGraphicSize(Std.int(bg.width * 0.6));
-		// bg.updateHitbox();
 		add(bg);
 
 		if(isIceBreaker) {
@@ -390,13 +278,6 @@ class TitleState extends MusicBeatState
 			snowstorm3.alpha = 1;
 			snowstorm3.antialiasing = ClientPrefs.globalAntialiasing;
 
-			//snowfgstrongest = new FlxBackdrop(Paths.image('iceolation/strongest', 'shared'), 0.2, 0, true, true);
-			//snowfgstrongest.velocity.set(-1100, 500).scale(speed);
-			//snowfgstrongest.updateHitbox();
-			//snowfgstrongest.screenCenter(XY);
-			//snowfgstrongest.alpha = 1;
-			//snowfgstrongest.antialiasing = ClientPrefs.globalAntialiasing;
-
 			add(snowfgweak);
 			add(snowfgweak2);
 			add(snowfgmid);
@@ -418,7 +299,6 @@ class TitleState extends MusicBeatState
 		logoBl.scale.y = minScale;
 		logoBl.screenCenter();
 		logoBl.y -= 65;
-
 
 		swagShader = new ColorSwap();
 		add(logoBl);
@@ -531,9 +411,6 @@ class TitleState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
-		// if (FlxG.sound.music != null)
-		// 	Conductor.songPosition = FlxG.sound.music.time;
-		// FlxG.watch.addQuick('amp', FlxG.sound.music.amplitude);
 		if (introMusic != null && introMusic.playing)
 			Conductor.songPosition = introMusic.time;
 		else if (FlxG.sound.music != null)
@@ -555,14 +432,10 @@ class TitleState extends MusicBeatState
 			logoBl.scale.y -= decScale * elapsed;
 		}
 
-		#if mobile
+		#if android
 		for (touch in FlxG.touches.list)
-		{
 			if (touch.justPressed)
-			{
 				pressedEnter = true;
-			}
-		}
 		#end
 
 		var gamepad:FlxGamepad = FlxG.gamepads.lastActive;
@@ -602,7 +475,6 @@ class TitleState extends MusicBeatState
 					}
 					closedState = true;
 				});
-				// FlxG.sound.play(Paths.music('titleShoot'), 0.7);
 			}
 		}
 
@@ -664,43 +536,22 @@ class TitleState extends MusicBeatState
 
 		if(logoBl != null)
 			FlxTween.tween(logoBl, {'scale.x': toScale, 'scale.y': toScale}, 0.025);
-			//logoBl.animation.play('bump', true);
 
 		if(!closedState) {
 			sickBeats++;
 			switch (sickBeats)
 			{
 				case 1:
-					// #if PSYCH_WATERMARKS
-					// createCoolText(['Psych Engine by'], 15);
-					// #else
 					createCoolText(['Retro Mod Team']);
-					//#end
 				case 3:
-					// #if PSYCH_WATERMARKS
-					// addMoreText('Shadow Mario', 15);
-					// addMoreText('RiverOaken', 15);
-					// addMoreText('shubs', 15);
-					// #else
 					deleteCoolText();
 					createCoolText(['Retro Mod Team']);
-
 					addMoreText('presents');
-					// #end
 				case 4:
 					deleteCoolText();
 				case 5:
-					// #if PSYCH_WATERMARKS
-					// createCoolText(['Not associated', 'with'], -40);
-					// #else
-					// createCoolText(['In association', 'with'], -40);
-					// #end
-
 					createCoolText(['Based on a game by']);
 				case 7:
-					// addMoreText('newgrounds', -40);
-					// ngSpr.visible = true;
-
 					deleteCoolText();
 					createCoolText([
 						'Based on a game by',
@@ -711,7 +562,6 @@ class TitleState extends MusicBeatState
 					]);
 				case 8:
 					deleteCoolText();
-					//ngSpr.visible = false;
 				case 9:
 					createCoolText([curWacky[0]]);
 				case 11:
@@ -724,7 +574,6 @@ class TitleState extends MusicBeatState
 					addMoreText('Vs RetroSpecter');
 				case 15:
 					addMoreText('Icebreaker 1.75');
-
 				case 16:
 					skipIntro();
 			}
