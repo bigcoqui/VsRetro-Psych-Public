@@ -69,6 +69,7 @@ vec3 hsv2rgb(vec3 c) {
 }
 
 void main() {
+  #pragma body
 	vec4 color = flixel_texture2DExtra(bitmap, openfl_TextureCoordv);
 
 	vec3 swagColor = rgb2hsv(color.rgb);
